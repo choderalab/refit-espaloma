@@ -13,15 +13,23 @@ from simtk.unit import Quantity
 
 
 def get_graph(record, key, idx):
-    # convert smiles to openff molecule
+    """
+    Convert HDF5 entries into dgl graphs.
+
+    NOTES
+    Dispersions terms needs to be added to energies and forces for Basic dataset as they are calculated seperately for openff-default QC specification.
+    This is not required for Optimization datasets as the dispersions terms are added to energies and forces when qcfractal returns the results.
+    """
+
+    # Convert mapped smiles to openff molecules
     try:
         smi = record["smiles"][0].decode('UTF-8')
     except:
-        # GEN2 OPTIMIZATION DATASET STORES SMILES INFORMATION DIFFERENTLY THAN OTHER DATASETS FOR SOME REASON
+        # GEN2 Optimization dataset nests smiles one layer deeper
         smi = record["smiles"][0][0].decode('UTF-8')
     offmol = Molecule.from_mapped_smiles(smi, allow_undefined_stereo=True)
 
-    # compute am1-bcc elf10 partial charge using openeye toolkit
+    # Compute AM1-BCC ELF10 using openeye-toolkit
     try:
         offmol.assign_partial_charges(partial_charge_method="am1bccelf10")
     except:
@@ -33,8 +41,6 @@ def get_graph(record, key, idx):
     charges = offmol.partial_charges.value_in_unit(esp.units.CHARGE_UNIT)
     g = esp.Graph(offmol)
 
-    # optimization and basic dataset stores energy and gradient differently when using openff-default qc spec
-    # dispersions energies and forces needs to be added when using basic dataset 
     try:
         energy = record["total_energy"]
         grad = record["total_gradient"]
@@ -47,7 +53,6 @@ def get_graph(record, key, idx):
             grad.append(gr + gr_corr)
     conformations = record["conformations"]
 
-    # energy is already hartree
     g.nodes["g"].data["u_ref"] = torch.tensor(
         [
             Quantity(
@@ -108,9 +113,7 @@ def load_from_hdf5(kwargs):
         record = hdf[key]
     except:
         _key = list(hdf.keys())[int(idx)]
-        print("Cannot load hdf from key. Perhaps black slash is missing. Load hdf from index.")
-        print("OLD: {}".format(key))
-        print("NEW: {}".format(_key))
+        print("Invalid key ({}). Get key from entry index ({}).".format(key, _key))
         record = hdf[_key]
     
     g = get_graph(record, key, idx)
