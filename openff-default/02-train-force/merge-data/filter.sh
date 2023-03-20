@@ -45,9 +45,9 @@ conda activate espaloma
 #python filter.py --dataset ${dataset}
 
 # rna-nucleoside
-dataset="rna-nucleoside"
-mkdir -p openff-2.0.0_filtered/${dataset}
-python filter.py --dataset ${dataset}
+#dataset="rna-nucleoside"
+#mkdir -p openff-2.0.0_filtered/${dataset}
+#python filter.py --dataset ${dataset}
 
 # spice-pubchem
 #dataset="spice-pubchem"
@@ -68,6 +68,10 @@ python filter.py --dataset ${dataset}
 #dataset="pepconf"
 #mkdir -p openff-2.0.0_filtered/${dataset}
 #python filter.py --dataset ${dataset}
+
+dataset="pepconf-dlc"
+mkdir -p openff-2.0.0_filtered/${dataset}
+python filter.py --dataset ${dataset}
 
 # spice-des-monomers
 #dataset="spice-des-monomers"
