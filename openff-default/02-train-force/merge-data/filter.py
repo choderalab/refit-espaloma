@@ -110,7 +110,7 @@ def run(kwargs):
 
 
 @click.command()
-@click.option("--dataset",  required=True, type=click.Choice(['gen2', 'pepconf', 'rna-diverse-trinucleotide', 'rna-trinucleotide', 'rna-nucleoside', 'spice-dipeptide', 'spice-pubchem', 'spice-des-monomers']), help="name of the dataset")
+@click.option("--dataset",  required=True, type=click.Choice(['gen2', 'pepconf', 'pepconf-dlc', 'rna-diverse-trinucleotide', 'rna-trinucleotide', 'rna-nucleoside', 'spice-dipeptide', 'spice-pubchem', 'spice-des-monomers']), help="name of the dataset")
 def cli(**kwargs):
     print(kwargs)
     print(esp.__version__)
