@@ -181,7 +181,7 @@ def run(kwargs):
 
 @click.command()
 @click.option("--path_to_dataset", required=True, help="path to the dataset")
-@click.option("--dataset",  required=True, type=click.Choice(['gen2', 'pepconf', 'pepconf-dlc', 'rna-diverse-trinucleotide', 'rna-trinucleotide', 'rna-nucleoside', 'spice-dipeptide', 'spice-pubchem', 'spice-des-monomers']), help="name of the dataset")
+@click.option("--dataset",  required=True, type=click.Choice(['gen2', 'gen2-torsion', 'pepconf', 'pepconf-dlc', 'protein-torsion', 'rna-diverse-trinucleotide', 'rna-trinucleotide', 'rna-nucleoside', 'spice-dipeptide', 'spice-pubchem', 'spice-des-monomers']), help="name of the dataset")
 @click.option("--forcefields", required=True, help="legacy forcefields in sequence [gaff-1.81, gaff-2.10, openff-1.2.0, openff-2.0.0, amber14-all.xml]", type=str)
 def cli(**kwargs):
     print(kwargs)

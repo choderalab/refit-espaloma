@@ -8,12 +8,11 @@ import torch
 import espaloma as esp
 
 
-# ---
+# 
 # Basic settings
-# ---
+# 
 BASE_FORCEFIELD = "openff-2.0.0"
 MAX_ENERGY = 0.1   # hartee (62.75 kcal/mol)
-MAX_ENERGY_DIFFERENCE = 0.065   # hartee (40.7875 kcal/mol)
 HARTEE_TO_KCALPERMOL = 627.5
 MIN_CONF = 5
 
@@ -29,7 +28,7 @@ def run(kwargs):
     n_total_confs = 0
     n_total_mols = len(paths_to_mydata)
 
-    with open("calc_ff_{}_filtered.log".format(dataset), "w") as wf:
+    with open("calc_ff_{}_filtered_lazy.log".format(dataset), "w") as wf:
         wf.write(">{}: {} molecules found\n".format(dataset, n_total_mols))
         for p in paths_to_mydata:
             _g = esp.Graph.load(p)
@@ -51,24 +50,25 @@ def run(kwargs):
             #print(index2)
             
             # Relative baseline ff energy
-            index3 = g.nodes['g'].data['u_%s' % BASE_FORCEFIELD] <= g.nodes['g'].data['u_%s' % BASE_FORCEFIELD].min() + MAX_ENERGY
-            index3 = index3.flatten()
+            #index3 = g.nodes['g'].data['u_%s' % BASE_FORCEFIELD] <= g.nodes['g'].data['u_%s' % BASE_FORCEFIELD].min() + MAX_ENERGY
+            #index3 = index3.flatten()
             #print(index3)
 
             # Energy difference between qm and baseline ff
-            _u = g.nodes['g'].data['u_%s' % BASE_FORCEFIELD] - g.nodes['g'].data['u_%s' % BASE_FORCEFIELD].min()
-            _u_qm = g.nodes['g'].data['u_qm'] - g.nodes['g'].data['u_qm'].min()
-            index4 = abs(_u - _u_qm) <= MAX_ENERGY_DIFFERENCE
-            index4 = index4.flatten()
+            #_u = g.nodes['g'].data['u_%s' % BASE_FORCEFIELD] - g.nodes['g'].data['u_%s' % BASE_FORCEFIELD].min()
+            #_u_qm = g.nodes['g'].data['u_qm'] - g.nodes['g'].data['u_qm'].min()
+            #index4 = abs(_u - _u_qm) <= MAX_ENERGY_DIFFERENCE
+            #index4 = index4.flatten()
             #print(index4)
 
 
             #
             # Get valid conformations that passed the filtering
             #
-            index12 = torch.logical_and(index1, index2)
-            index34 = torch.logical_and(index3, index4)
-            index = torch.logical_and(index12, index34)
+            #index12 = torch.logical_and(index1, index2)
+            #index34 = torch.logical_and(index3, index4)
+            #index = torch.logical_and(index12, index34)
+            index = torch.logical_and(index1, index2)
             #print(index)
 
             for key in g.nodes['g'].data.keys():
@@ -98,7 +98,7 @@ def run(kwargs):
                 wf.write("{:8d}: {:4d} / {:4d} conformations passed the filter ({} excluded)\n".format(entry_id, n_passed_confs, n_confs, n_confs - n_passed_confs))
 
             if n_passed_confs >= MIN_CONF:
-                g.save('{}/{}/{}'.format(BASE_FORCEFIELD + "_filtered", dataset, entry_id))
+                g.save('{}/{}/{}'.format(BASE_FORCEFIELD + "_filtered_lazy", dataset, entry_id))
                 n_valid_mols += 1
 
         wf.write("------------------\n")
