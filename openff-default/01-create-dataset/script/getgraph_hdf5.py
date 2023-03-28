@@ -96,7 +96,7 @@ def get_graph(record, key, idx):
         dim=1,
     )
 
-    g.nodes['n1'].data['q_ref'] = c = torch.tensor(charges, dtype=torch.float32,).unsqueeze(-1)
+    g.nodes['n1'].data['q_ref'] = torch.tensor(charges, dtype=torch.float32,).unsqueeze(-1)
     
     return g
 
