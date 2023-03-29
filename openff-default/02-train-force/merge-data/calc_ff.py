@@ -139,38 +139,40 @@ def run(kwargs):
     with open("calc_ff_{}.log".format(dataset), "w") as wf:
         wf.write(">{}: {} molecules found\n".format(dataset, n_total_mols))
         for p in paths_to_mydata:
-            _g = esp.Graph.load(p)   # graph generated from hdf5 file. u_ref corresponds to native QM energy.
-            g = copy.deepcopy(_g)
-            n_confs = g.nodes['n1'].data['xyz'].shape[1]
-            n_total_confs += n_confs
+            try:
+                _g = esp.Graph.load(p)   # graph generated from hdf5 file. u_ref corresponds to native QM energy.
+                g = copy.deepcopy(_g)
+                n_confs = g.nodes['n1'].data['xyz'].shape[1]
+                n_total_confs += n_confs
 
-            """
-            subtract nonbonded from qm and calculate legacy forcefields
-            """
-            # clone qm energy
-            g.nodes['g'].data['u_qm'] = g.nodes['g'].data['u_ref'].detach().clone()
-            g.nodes['n1'].data['u_qm_prime'] = g.nodes['n1'].data['u_ref_prime'].detach().clone()
+                """
+                subtract nonbonded from qm and calculate legacy forcefields
+                """
+                # clone qm energy
+                g.nodes['g'].data['u_qm'] = g.nodes['g'].data['u_ref'].detach().clone()
+                g.nodes['n1'].data['u_qm_prime'] = g.nodes['n1'].data['u_ref_prime'].detach().clone()
 
-            
-            # subtract nonbonded interaction energy. u_ref will be overwritten.
-            g = subtract_nonbonded_force(g, forcefield=BASE_FORCEFIELD, subtract_charges=True)
+                
+                # subtract nonbonded interaction energy. u_ref will be overwritten.
+                g = subtract_nonbonded_force(g, forcefield=BASE_FORCEFIELD, subtract_charges=True)
 
-            # calculate baseline energy with legacy forcefields
-            for forcefield in forcefields:
-                g = baseline_energy_force(g, forcefield)
+                # calculate baseline energy with legacy forcefields
+                for forcefield in forcefields:
+                    g = baseline_energy_force(g, forcefield)
 
-            """
-            report
-            """
-            entry_id = p.split('/')[5]  # str
-            wf.write("{:8d}: {:4d} conformations found\n".format(int(entry_id), n_confs))
+                """
+                report
+                """
+                entry_id = p.split('/')[5]  # str
+                wf.write("{:8d}: {:4d} conformations found\n".format(int(entry_id), n_confs))
 
 
-            """
-            save graph
-            """
-            g.save('{}/{}/{}'.format(BASE_FORCEFIELD, dataset, entry_id))
-
+                """
+                save graph
+                """
+                g.save('{}/{}/{}'.format(BASE_FORCEFIELD, dataset, entry_id))
+            except:
+                print(f"COULD NOT PROCESS MOLECULE {p}")
 
         # summary
         wf.write("------------------\n")
