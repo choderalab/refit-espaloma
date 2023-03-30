@@ -128,6 +128,7 @@ def load_from_hdf5(kwargs):
 @click.option("--index", required=True, help="key entry id used to load hdf5 if it fails to load from keyname.")
 def cli(**kwargs):
     print(kwargs)
+    print(esp.__version__)
     load_from_hdf5(kwargs)
 
 
