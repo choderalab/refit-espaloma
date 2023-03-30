@@ -1,0 +1,8 @@
+# Archived data
+openff-default.archived
+
+# Dgl graphs
+openff-default/01-create-dataset/**data**
+
+# Local memo
+openff-default/01-create-dataset/**/**/finished
