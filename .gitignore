@@ -1,8 +1,11 @@
-# Archived data
-openff-default.archived
-
 # Dgl graphs
-openff-default/01-create-dataset/**data**
-
-# Local memo
-openff-default/01-create-dataset/**/**/finished
+openff-default/01-create-dataset/Dataset/rna-diverse/data/
+openff-default/01-create-dataset/Dataset/rna-nucleoside/data/
+openff-default/01-create-dataset/Dataset/rna-trinucleotide/data/
+openff-default/01-create-dataset/Dataset/spice-des-monomers/data/
+openff-default/01-create-dataset/Dataset/spice-dipeptide/data/
+openff-default/01-create-dataset/Dataset/spice-pubchem/data/
+openff-default/01-create-dataset/OptimizationDataset/gen2/
+openff-default/01-create-dataset/OptimizationDataset/pepconf-dlc/
+openff-default/01-create-dataset/TorsionDriveDataset/gen2-torsion/
+openff-default/01-create-dataset/TorsionDriveDataset/protein-torsion/
