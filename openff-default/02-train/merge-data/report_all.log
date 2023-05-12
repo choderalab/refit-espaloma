@@ -1,0 +1,12 @@
+DATASET             	TOTAL_CONFS         	TOTAL_MOLS          	UNIQUE_ISOMERIC_SMILES	UNIQUE_NONISOMERIC_SMILES
+gen2                	              244989	                1024	                1024	                1024
+gen2-torsion        	               25832	                 940	                 729	                 711
+pepconf-dlc         	              166291	                 557	                 557	                 554
+protein-torsion     	               48999	                 106	                  62	                  62
+spice-dipeptide     	               26279	                 677	                 677	                 677
+spice-pubchem       	              608436	               14110	               14110	               14110
+spice-des-monomers  	               18435	                 369	                 369	                 369
+------------
+TOTAL NUMBER OF ENTRIES (MOLS): 17783
+TOTAL NUMBER OF UNIQUE ISOMERIC SMILES: 17359
+TOTAL NUMBER OF UNIQUE NONISOMERIC SMILES: 17325

@@ -1,0 +1,10 @@
+>rna-nucleoside: 4 molecules found
+       3: 2384 / 2388 conformations passed the filter (4 excluded)
+       2: 2390 / 2392 conformations passed the filter (2 excluded)
+       1: 2377 / 2382 conformations passed the filter (5 excluded)
+       0: 2391 / 2393 conformations passed the filter (2 excluded)
+------------------
+>total molecules: 4
+>total conformations: 9555
+>total valid molecules: 4
+>total valid conformations: 9542
