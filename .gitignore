@@ -1,11 +1,13 @@
 # Dgl graphs
-openff-default/01-create-dataset/Dataset/rna-diverse/data/
-openff-default/01-create-dataset/Dataset/rna-nucleoside/data/
-openff-default/01-create-dataset/Dataset/rna-trinucleotide/data/
-openff-default/01-create-dataset/Dataset/spice-des-monomers/data/
-openff-default/01-create-dataset/Dataset/spice-dipeptide/data/
-openff-default/01-create-dataset/Dataset/spice-pubchem/data/
+openff-default/01-create-dataset/Dataset/rna-diverse/
+openff-default/01-create-dataset/Dataset/rna-nucleoside/
+openff-default/01-create-dataset/Dataset/rna-trinucleotide/
+openff-default/01-create-dataset/Dataset/spice-des-monomers/
+openff-default/01-create-dataset/Dataset/spice-dipeptide/
+openff-default/01-create-dataset/Dataset/spice-pubchem/
 openff-default/01-create-dataset/OptimizationDataset/gen2/
 openff-default/01-create-dataset/OptimizationDataset/pepconf-dlc/
 openff-default/01-create-dataset/TorsionDriveDataset/gen2-torsion/
 openff-default/01-create-dataset/TorsionDriveDataset/protein-torsion/
+
+# Logs
