@@ -39,46 +39,46 @@ mkdir -p openff-2.0.0_filtered/${dataset}
 python ./script/filter.py --dataset ${dataset}
 
 # rna-trinucleotide
-#dataset="rna-trinucleotide"
-#mkdir -p openff-2.0.0_filtered/${dataset}
-#python ./script/filter.py --dataset ${dataset}
+dataset="rna-trinucleotide"
+mkdir -p openff-2.0.0_filtered/${dataset}
+python ./script/filter.py --dataset ${dataset}
 
 # rna-nucleoside
-#dataset="rna-nucleoside"
-#mkdir -p openff-2.0.0_filtered/${dataset}
-#python ./script/filter.py --dataset ${dataset}
+dataset="rna-nucleoside"
+mkdir -p openff-2.0.0_filtered/${dataset}
+python ./script/filter.py --dataset ${dataset}
 
 # spice-pubchem
-#dataset="spice-pubchem"
-#mkdir -p openff-2.0.0_filtered/${dataset}
-#python ./script/filter.py --dataset ${dataset}
+dataset="spice-pubchem"
+mkdir -p openff-2.0.0_filtered/${dataset}
+python ./script/filter.py --dataset ${dataset}
 
 # spice-dipeptide
-#dataset="spice-dipeptide"
-#mkdir -p openff-2.0.0_filtered/${dataset}
-#python ./script/filter.py --dataset ${dataset}
+dataset="spice-dipeptide"
+mkdir -p openff-2.0.0_filtered/${dataset}
+python ./script/filter.py --dataset ${dataset}
 
 # spice-des-monomers
-#dataset="spice-des-monomers"
-#mkdir -p openff-2.0.0_filtered/${dataset}
-#python ./script/filter.py --dataset ${dataset}
+dataset="spice-des-monomers"
+mkdir -p openff-2.0.0_filtered/${dataset}
+python ./script/filter.py --dataset ${dataset}
 
 # gen2
-#dataset="gen2"
-#mkdir -p openff-2.0.0_filtered/${dataset}
-#python ./script/filter.py --dataset ${dataset}
+dataset="gen2"
+mkdir -p openff-2.0.0_filtered/${dataset}
+python ./script/filter.py --dataset ${dataset}
 
 # pepconf-dlc
-#dataset="pepconf-dlc"
-#mkdir -p openff-2.0.0_filtered/${dataset}
-#python ./script/filter.py --dataset ${dataset}
+dataset="pepconf-dlc"
+mkdir -p openff-2.0.0_filtered/${dataset}
+python ./script/filter.py --dataset ${dataset}
 
 # gen2-torsion
-#dataset="gen2-torsion"
-#mkdir -p openff-2.0.0_filtered/${dataset}
-#python ./script/filter.py --dataset ${dataset}
+dataset="gen2-torsion"
+mkdir -p openff-2.0.0_filtered/${dataset}
+python ./script/filter.py --dataset ${dataset}
 
 # protein-torsion
-#dataset="protein-torsion"
-#mkdir -p openff-2.0.0_filtered/${dataset}
-#python ./script/filter.py --dataset ${dataset}
+dataset="protein-torsion"
+mkdir -p openff-2.0.0_filtered/${dataset}
+python ./script/filter.py --dataset ${dataset}
