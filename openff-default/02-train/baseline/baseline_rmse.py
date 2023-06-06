@@ -5,6 +5,13 @@ import random
 import click
 import espaloma as esp
 import torch
+# added for baseline force field calculation
+from espaloma.data.md import *
+from openff.toolkit.topology import Molecule
+from openmmforcefields.generators import SystemGenerator
+from openmm import openmm, unit
+from openmm.app import Simulation
+from openmm.unit import Quantity
 
 
 # Parameters
@@ -12,6 +19,71 @@ HARTEE_TO_KCALPERMOL = 627.5
 BOHR_TO_ANGSTROMS = 0.529177
 RANDOM_SEED = 2666
 TRAIN_RATIO, VAL_RATIO, TEST_RATIO = 0.8, 0.1, 0.1
+
+# Simulation Specs
+TEMPERATURE = 350 * unit.kelvin
+STEP_SIZE = 1.0 * unit.femtosecond
+COLLISION_RATE = 1.0 / unit.picosecond
+EPSILON_MIN = 0.05 * unit.kilojoules_per_mole
+
+
+def baseline_energy_force(g):
+    """
+    Calculate baseline energy using openff-2.1.0 forcefield
+    
+    reference:
+    https://github.com/choderalab/espaloma/espaloma/data/md.py
+    """
+    generator = SystemGenerator(
+        small_molecule_forcefield="/home/takabak/.offxml/openff-2.1.0.offxml",
+        molecules=[g.mol],
+        forcefield_kwargs={"constraints": None, "removeCMMotion": False},
+    )
+    suffix = 'openff-2.1.0'
+
+    # parameterize topology
+    topology = g.mol.to_topology().to_openmm()
+    # create openmm system
+    system = generator.create_system(topology)
+    # use langevin integrator, although it's not super useful here
+    integrator = openmm.LangevinIntegrator(TEMPERATURE, COLLISION_RATE, STEP_SIZE)
+    # create simulation
+    simulation = Simulation(topology=topology, system=system, integrator=integrator)
+    # get energy
+    us = []
+    us_prime = []
+    xs = (
+        Quantity(
+            g.nodes["n1"].data["xyz"].detach().numpy(),
+            esp.units.DISTANCE_UNIT,
+        )
+        .value_in_unit(unit.nanometer)
+        .transpose((1, 0, 2))
+    )
+    for x in xs:
+        simulation.context.setPositions(x)
+        us.append(
+            simulation.context.getState(getEnergy=True)
+            .getPotentialEnergy()
+            .value_in_unit(esp.units.ENERGY_UNIT)
+        )
+        us_prime.append(
+            simulation.context.getState(getForces=True)
+            .getForces(asNumpy=True)
+            .value_in_unit(esp.units.FORCE_UNIT) * -1
+        )
+
+    #us = torch.tensor(us)[None, :]
+    us = torch.tensor(us, dtype=torch.float64)[None, :]
+    us_prime = torch.tensor(
+        np.stack(us_prime, axis=1),
+        dtype=torch.get_default_dtype(),
+    )
+
+    g.nodes['g'].data['u_%s' % suffix] = us
+    g.nodes['n1'].data['u_%s_prime' % suffix] = us_prime
+
+    return g
 
 
 def run(kwargs):
@@ -23,16 +95,14 @@ def run(kwargs):
     # Convert forcefields into list
     forcefields = [ str(_) for _ in _forcefields.split() ]
 
-
     #
     # Load datasets
     #
     print("# LOAD UNIQUE MOLECULES")
     path = os.path.join(input_prefix, dataset)
 
-    if dataset == "rna-trinucleotide":
-        ds = esp.data.dataset.GraphDataset.load(path).shuffle(RANDOM_SEED)
-        ds_tr, ds_vl, ds_te = ds.split([0, 0, 1])
+    if dataset in ["rna-trinucleotide", "rna-nucleoside"]:
+        raise NotImplementedError(f"Not supported for {dataset}")
     else:
         ds = esp.data.dataset.GraphDataset.load(path).shuffle(RANDOM_SEED)
         ds_tr, ds_vl, ds_te = ds.split([TRAIN_RATIO, VAL_RATIO, TEST_RATIO])
@@ -99,6 +169,11 @@ def run(kwargs):
         g.nodes["n1"].data["xyz"].requires_grad = True
         return g
 
+    # add openff-2.1.0 as baseline force field
+    ds_tr.apply(baseline_energy_force, in_place=True)
+    ds_vl.apply(baseline_energy_force, in_place=True)
+    ds_te.apply(baseline_energy_force, in_place=True)
+
     ds_tr.apply(fn, in_place=True)
     ds_vl.apply(fn, in_place=True)
     ds_te.apply(fn, in_place=True)
@@ -110,15 +185,17 @@ def run(kwargs):
     ds_te.apply(regenerate_impropers, in_place=True)
 
 
-
     """
     Calculate rmse metric
     """
+
+    wf = open("summary.csv", "w")
+
     #
     # train
     #
-    print(">train")
-    print("-----------")
+    wf.write(">train\n")
+    wf.write("-----------\n")
     import pandas as pd
     df = pd.DataFrame(columns=["SMILES"] + [forcefield + "_ENERGY_RMSE" for forcefield in forcefields] + [forcefield + "_FORCE_RMSE" for forcefield in forcefields])
 
@@ -151,6 +228,7 @@ def run(kwargs):
             # force
             u_prime = g.nodes['n1'].data['u_%s_prime' % forcefield].detach().cpu().flatten()
             us["u_%s_prime" % forcefield].append(u_prime)
+            print(forcefield, u_qm_prime.shape, u_prime.shape)
             f_rmse = esp.metrics.rmse(u_qm_prime, u_prime) * (HARTEE_TO_KCALPERMOL/BOHR_TO_ANGSTROMS)
             row[forcefield + "_FORCE_RMSE"] = f_rmse.item()
         df = df.append(row, ignore_index=True)
@@ -160,19 +238,19 @@ def run(kwargs):
     for forcefield in forcefields:
         us["u_%s" % forcefield] = torch.cat(us["u_%s" % forcefield], dim=0) * HARTEE_TO_KCALPERMOL
 
-    print("#energy")
+    wf.write("#energy\n")
     for forcefield in forcefields:
-        print(forcefield)
-        print(
+        wf.write(f"{forcefield}\n")
+        wf.write(
             esp.metrics.latex_format_ci(
                 *esp.metrics.bootstrap(
                     esp.metrics.rmse,
                     n_samples=1000
-                )(
+               )(
                     us["u_qm"],
                     us["u_%s" % forcefield],
                 )
-            )
+            ) + "\n"
         )
 
     # boostrap force
@@ -180,10 +258,10 @@ def run(kwargs):
     for forcefield in forcefields:
         us["u_%s_prime" % forcefield] = torch.cat(us["u_%s_prime" % forcefield], dim=0) * (HARTEE_TO_KCALPERMOL/BOHR_TO_ANGSTROMS)
 
-    print("#force")
+    wf.write("#force\n")
     for forcefield in forcefields:
-        print(forcefield)
-        print(
+        wf.write(f"{forcefield}\n")
+        wf.write(
             esp.metrics.latex_format_ci(
                 *esp.metrics.bootstrap(
                     esp.metrics.rmse,
@@ -192,12 +270,12 @@ def run(kwargs):
                     us["u_qm_prime"],
                     us["u_%s_prime" % forcefield],
                 )
-            )
+            ) + "\n"
         )
-    print("\n")
+    wf.write("\n")
 
     # save
-    df = df.sort_values(by="openff-2.0.0_FORCE_RMSE", ascending=False) 
+    df = df.sort_values(by="openff-2.1.0_FORCE_RMSE", ascending=False) 
     df.to_csv("inspect_tr.csv")
 
 
@@ -205,8 +283,8 @@ def run(kwargs):
     #
     # validation
     #
-    print(">validation")
-    print("-----------")
+    wf.write(">validation\n")
+    wf.write("-----------\n")
     import pandas as pd
     df = pd.DataFrame(columns=["SMILES"] + [forcefield + "_ENERGY_RMSE" for forcefield in forcefields] + [forcefield + "_FORCE_RMSE" for forcefield in forcefields])
 
@@ -248,10 +326,10 @@ def run(kwargs):
     for forcefield in forcefields:
         us["u_%s" % forcefield] = torch.cat(us["u_%s" % forcefield], dim=0) * HARTEE_TO_KCALPERMOL
 
-    print("#energy")
+    wf.write("#energy\n")
     for forcefield in forcefields:
-        print(forcefield)
-        print(
+        wf.write(f"{forcefield}\n")
+        wf.write(
             esp.metrics.latex_format_ci(
                 *esp.metrics.bootstrap(
                     esp.metrics.rmse,
@@ -260,7 +338,7 @@ def run(kwargs):
                     us["u_qm"],
                     us["u_%s" % forcefield],
                 )
-            )
+            ) + "\n"
         )
 
     # boostrap force
@@ -268,10 +346,10 @@ def run(kwargs):
     for forcefield in forcefields:
         us["u_%s_prime" % forcefield] = torch.cat(us["u_%s_prime" % forcefield], dim=0) * (HARTEE_TO_KCALPERMOL/BOHR_TO_ANGSTROMS)
 
-    print("#force")
+    wf.write("#force\n")
     for forcefield in forcefields:
-        print(forcefield)
-        print(
+        wf.write(f"{forcefield}\n")
+        wf.write(
             esp.metrics.latex_format_ci(
                 *esp.metrics.bootstrap(
                     esp.metrics.rmse,
@@ -280,12 +358,12 @@ def run(kwargs):
                     us["u_qm_prime"],
                     us["u_%s_prime" % forcefield],
                 )
-            )
+            ) + "\n"
         )
-    print("\n")
+    wf.write("\n")
 
     # save
-    df = df.sort_values(by="openff-2.0.0_FORCE_RMSE", ascending=False) 
+    df = df.sort_values(by="openff-2.1.0_FORCE_RMSE", ascending=False) 
     df.to_csv("inspect_vl.csv")
 
 
@@ -293,8 +371,8 @@ def run(kwargs):
     #
     # test
     #
-    print(">test")
-    print("-----------")
+    wf.write(">test\n")
+    wf.write("-----------\n")
     import pandas as pd
     df = pd.DataFrame(columns=["SMILES"] + [forcefield + "_ENERGY_RMSE" for forcefield in forcefields] + [forcefield + "_FORCE_RMSE" for forcefield in forcefields])
 
@@ -336,10 +414,10 @@ def run(kwargs):
     for forcefield in forcefields:
         us["u_%s" % forcefield] = torch.cat(us["u_%s" % forcefield], dim=0) * HARTEE_TO_KCALPERMOL
 
-    print("#energy")
+    wf.write("#energy\n")
     for forcefield in forcefields:
-        print(forcefield)
-        print(
+        wf.write(f"{forcefield}\n")
+        wf.write(
             esp.metrics.latex_format_ci(
                 *esp.metrics.bootstrap(
                     esp.metrics.rmse,
@@ -348,7 +426,7 @@ def run(kwargs):
                     us["u_qm"],
                     us["u_%s" % forcefield],
                 )
-            )
+            ) + "\n"
         )
 
     # boostrap force
@@ -356,10 +434,10 @@ def run(kwargs):
     for forcefield in forcefields:
         us["u_%s_prime" % forcefield] = torch.cat(us["u_%s_prime" % forcefield], dim=0) * (HARTEE_TO_KCALPERMOL/BOHR_TO_ANGSTROMS)
 
-    print("#force")
+    wf.write("#force\n")
     for forcefield in forcefields:
-        print(forcefield)
-        print(
+        wf.write(f"{forcefield}\n")
+        wf.write(
             esp.metrics.latex_format_ci(
                 *esp.metrics.bootstrap(
                     esp.metrics.rmse,
@@ -368,12 +446,13 @@ def run(kwargs):
                     us["u_qm_prime"],
                     us["u_%s_prime" % forcefield],
                 )
-            )
+            ) + "\n"
         )
-    print("\n")
+    wf.write("\n")
+    wf.close()
 
     # save
-    df = df.sort_values(by="openff-2.0.0_FORCE_RMSE", ascending=False) 
+    df = df.sort_values(by="openff-2.1.0_FORCE_RMSE", ascending=False) 
     df.to_csv("inspect_te.csv")
 
 
