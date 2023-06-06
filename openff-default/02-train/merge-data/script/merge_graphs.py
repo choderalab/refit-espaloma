@@ -63,9 +63,10 @@ def filter_graph(g):
     ## Filter
     for key in g.nodes['g'].data.keys():
         if key.startswith('u_'):    
-            g.nodes['g'].data[key] = g.nodes['g'].data[key][:, index]            
-    g.nodes['n1'].data['u_ref_prime'] = g.nodes['n1'].data['u_ref_prime'][:, index, :]
-    g.nodes['n1'].data['xyz'] = g.nodes['n1'].data['xyz'][:, index, :]
+            g.nodes['g'].data[key] = g.nodes['g'].data[key][:, index]
+    for key in g.nodes['n1'].data.keys():
+        if key.startswith('u_') or key.startswith('xyz'):
+            g.nodes['n1'].data[key] = g.nodes['n1'].data[key][:, index, :]
 
     ## Recalculate relative u_ref
     g.nodes['g'].data['u_ref_relative'] = g.nodes['g'].data['u_ref_relative'] - g.nodes['g'].data['u_ref_relative'].mean(dim=-1, keepdims=True)
