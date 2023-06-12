@@ -1,16 +1,11 @@
 # Refit espaloma with energies and forces
-This repository includes scripts to retrain espaloma forcefield 
+This repository includes scripts to retrain espaloma forcefield.
 
 
 ### Description
 
 
 ### Usage
-
-
-
-### Notes
-
 
 
 ### Manifest
@@ -29,13 +24,10 @@ This repository includes scripts to retrain espaloma forcefield
         - `TorsionDriveDataset/` - TorsionDriveDataset group in QCArchive
             - `gen2-torsion/`
             - `protein-torsion/`
-    - `02-train/` - Train espaloma
-        - `merge-data/` - Scripts used to preprocess dgl graphs prior to training
+    - `02-train/` - Refit and evaluate espaloma
         - `baseline/` - Scripts used to calculate baseline energies and forces using other forcefields
+        - `joint-improper-charge/charge-weight-1.0/` - Scripts used to refit and evaluate espaloma
+        - `merge-data/` - Scripts used to preprocess dgl graphs prior to training
 
-### CHANGE LOG
-- 2023.03.11 `$WORKDIR/rna-espaloma/espaloma-openff-default.3` moved to `$WORKDIR/refit-espaloma/openff-default`
-    - Clean-up diretory
-- 2023.03.29 `$WORKDIR/rna-espaloma/openff-default` moved to `$WORKDIR/exploring-rna/refit-espaloma/openff-default.arhived`
-    - Archived to rerun experiment with improved input features with `espaloma-0.2.4+11`
+### Notes
 
