@@ -1,3 +1,22 @@
+# stdout/stderr
+**.stderr
+**.stdout
+
+# pytorch checkpoint files
+**.th
+**.pt
+
+# log, csv, png
+**.csv
+**.log
+**.png
+
+# archived files/directories
+**_obsolete/
+
+# debug
+**debug/
+
 # Dgl graphs
 openff-default/01-create-dataset/Dataset/rna-diverse/
 openff-default/01-create-dataset/Dataset/rna-nucleoside/
@@ -10,4 +29,13 @@ openff-default/01-create-dataset/OptimizationDataset/pepconf-dlc/
 openff-default/01-create-dataset/TorsionDriveDataset/gen2-torsion/
 openff-default/01-create-dataset/TorsionDriveDataset/protein-torsion/
 
-# Logs
+# large files
+openff-default/02-train/merge-data/openff-2.0.0_filtered/
+openff-default/02-train/merge-data/openff-2.0.0/
+
+# others
+openff-default/02-train/joint-improper-charge/charge-weight-1.0/copy_model_as_release.sh
+openff-default/02-train/joint-improper-charge/charge-weight-1.0/lsf-submit-extend.sh
+openff-default/02-train/joint-improper-charge/charge-weight-1.0/eval/pkl/
+openff-default/02-train/joint-improper-charge/charge-weight-0.1/
+openff-default/02-train/merge-data/notebook/
