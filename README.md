@@ -20,7 +20,8 @@ Electronegativity and hardness of atoms were predicted to predict the atomic par
 
 ## Manifest
 - `openff-default/`
-    - `01-create-dataset/` - Convert HDF5 data to dgl graphs
+    - `01-create-dataset/` - Convert HDF5 to DGL graphs
+        - `script/` - Stores scripts to convert HDF5 to DGL graphs
         - `Dataset/` - Collection of Dataset group in QCArchive
             - `spice-des-monomers/`
             - `spice-dipeptide/`
