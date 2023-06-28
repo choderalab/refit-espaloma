@@ -4,7 +4,7 @@ This repository includes scripts to retrain and generate `espaloma-0.3.0` forcef
 
 
 ## Description
-We first convert the downloaded HDF5 obtained from [download-qca-dataset](https://github.com/choderalab/download-qca-datasets) to DGL graphs.
+We first convert the HDF5 obtained from [download-qca-dataset](https://github.com/choderalab/download-qca-datasets) to DGL graphs.
 Here, we compute the [AM1BCC-ELF10](https://docs.eyesopen.com/toolkits/python/quacpactk/molchargetheory.html) partial charges using openeye toolkit as a reference.
 
 Molecules with a gap between minimum and maximum energy larger than 0.1 Hartree (62.5 kcal/mol) were excluded from the dataset prior to the refitting experiment, 
@@ -22,17 +22,17 @@ Electronegativity and hardness of atoms were predicted to predict the atomic par
 - `openff-default/`
     - `01-create-dataset/` - Convert HDF5 to DGL graphs
         - `script/` - Stores scripts to convert HDF5 to DGL graphs
-        - `Dataset/` - Collection of Dataset group in QCArchive
+        - `Dataset/` - Collection of Dataset from QCArchive
             - `spice-des-monomers/`
             - `spice-dipeptide/`
             - `spice-pubchem/`
             - `rna-diverse/`
             - `rna-trincleotide/`
             - `rna-nucleoside/`
-        - `OptimizationDataset/` - Collection of BasicDataset group in QCArchive
+        - `OptimizationDataset/` - Collection of OptimizationDataset from QCArchive
             - `gen2/`
             - `pepconf-dlc/`
-        - `TorsionDriveDataset/` - Collection of TorsionDriveDataset group in QCArchive
+        - `TorsionDriveDataset/` - Collection of TorsionDriveDataset from QCArchive
             - `gen2-torsion/`
             - `protein-torsion/`
     - `02-train/` - Refit and evaluate espaloma
@@ -40,10 +40,13 @@ Electronegativity and hardness of atoms were predicted to predict the atomic par
         - `joint-improper-charge/charge-weight-1.0/` - Scripts used to refit and evaluate espaloma
         - `merge-data/` - Scripts used to preprocess dgl graphs prior to training
 - `envs/` - Stores conda environment files
-    - `environment-create-dataset.yaml` - Conda environment used to convert HDF5 data to DGL graphs in `01-create-dataset/`
+    - `environment-create-dataset.yaml` - Conda environment used to convert HDF5 to DGL graphs in `01-create-dataset/`
     - `environment-refit.yaml` - Conda environment to train and evaluate espaloma in `02-train/`
 
-### Dependencies
+## Note
+Please refer [here](https://github.com/choderalab/download-qca-datasets) for more details about the actual origin of the dataset described above.
+
+## Dependencies
 [Espaloma ver. 0.3.0](https://github.com/choderalab/espaloma/tree/0.3.0) was used to create the DGL graphs in `01-create-dataset/`.
 Note that version 0.3.0 is no longer compatible with the 0.2.x models, and vice versa.
 A fixed version of 0.3.0 (commit hash:[4c6155b72d00ce0190b3cb551e7e59f0adc33a56](https://github.com/choderalab/espaloma/tree/4c6155b72d00ce0190b3cb551e7e59f0adc33a56)) 
