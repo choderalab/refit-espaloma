@@ -6,6 +6,8 @@ This repository contains scripts to prepare the input DGL graphs used in trainin
 - Seperating duplicated isomeric smiles within different datasets into a new dataset
 - Merge duplicated isomeric smiles from different datasets into a single DGL graph
 
+The preprocessed data in `openff-default/02-train/merge-data/` is available [here](https://doi.org/10.5281/zenodo.8150601) on Zenodo for training `espaloma-0.3.0`.
+
 ## Manifest
 - `script`: Stores main scripts to filter and prepare input DGL graphs in training espaloma
     - `calc_ff.py`: Compute baseline energies and forces using `gaff-1.81`, `gaff-2.11`, `openff-1.2.1`, `openff-2.0.0`, and `Amber ff14SB (RNA.OL3)`

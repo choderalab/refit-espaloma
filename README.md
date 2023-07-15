@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8150601.svg)](https://doi.org/10.5281/zenodo.8150601)
+
 # Train and evaluate espaloma
 This repository includes scripts to retrain and generate `espaloma-0.3.0` forcefield.
 `espaloma-0.3.0` force field is a `Class I` force field where the valence parameters are assigned and optimized via machine learning framework.
@@ -52,3 +54,6 @@ Please refer [here](https://github.com/choderalab/download-qca-datasets) to find
 Note that version 0.3.0 is no longer compatible with the 0.2.x models, and vice versa.
 A fixed version of 0.3.0 (commit hash:[4c6155b72d00ce0190b3cb551e7e59f0adc33a56](https://github.com/choderalab/espaloma/tree/4c6155b72d00ce0190b3cb551e7e59f0adc33a56)) 
 was used for the refitting experinment and model evaluation which allows improper torsions to be fit to n=1,2 phase multiplicity.
+
+## Note
+For a quick start, the preprocessed data in `openff-default/02-train/merge-data/` is available [here](https://doi.org/10.5281/zenodo.8150601) on Zenodo for training `espaloma-0.3.0`.
