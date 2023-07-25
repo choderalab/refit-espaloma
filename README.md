@@ -57,3 +57,17 @@ was used for the refitting experinment and model evaluation which allows imprope
 
 ## Note
 For a quick start, the preprocessed data in `openff-default/02-train/merge-data/` is available [here](https://doi.org/10.5281/zenodo.8150601) on Zenodo for training `espaloma-0.3.0`.
+
+## Citation
+If you find this helpful please cite the following:
+
+```
+@misc{takaba2023espaloma030,
+      title={Espaloma-0.3.0: Machine-learned molecular mechanics force field for the simulation of protein-ligand systems and beyond}, 
+      author={Kenichiro Takaba and Iván Pulido and Mike Henry and Hugo MacDermott-Opeskin and John D. Chodera and Yuanqing Wang},
+      year={2023},
+      eprint={2307.07085},
+      archivePrefix={arXiv},
+      primaryClass={physics.chem-ph}
+}
+```
