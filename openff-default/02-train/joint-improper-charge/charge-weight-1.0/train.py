@@ -49,7 +49,8 @@ def _load_datasets(datasets, input_prefix):
 
 def _load_duplicate_datasets(ds_tr, input_prefix):
     """
-    Load duplicated molecules (nonisomeric smiles) found from different datasets.
+    Load duplicated molecules (isomeric smiles) from different datasets 
+    to avoid overlapping molecules in train, validate, test dataset.
     """
     entries = glob.glob(os.path.join(input_prefix, "duplicated-isomeric-smiles-merge", "*"))
     random.seed(RANDOM_SEED)
