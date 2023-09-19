@@ -24,6 +24,7 @@ TRAIN_RATIO, VAL_RATIO, TEST_RATIO = 0.8, 0.1, 0.1
 #---------------
 def load_data(input_prefix, dataset):
     """
+    Load dgl graphs
     """
     # Load unique molecules
     print("# LOAD UNIQUE MOLECULES")
@@ -83,6 +84,7 @@ def load_data(input_prefix, dataset):
 
 def fn(g):
     """
+    Remove unnecessarily data from graph
     """
     g.nodes['g'].data.pop('u_qm')
     g.nodes['g'].data.pop('u_gaff-1.81')
@@ -101,15 +103,14 @@ def fn(g):
 
 
 def add_grad(g):
-    """
-    """
     g.nodes["n1"].data["xyz"].requires_grad = True
     return g
 
 
 
-def bootstrap(u_ref, u, u_ref_prime, u_prime):
+def bootstrap_conf(u_ref, u, u_ref_prime, u_prime):
     """
+    Bootstrap over conformations
     """
     u_ref = torch.cat(u_ref, dim=0) * HARTEE_TO_KCALPERMOL
     u = torch.cat(u, dim=0) * HARTEE_TO_KCALPERMOL
@@ -137,8 +138,50 @@ def bootstrap(u_ref, u, u_ref_prime, u_prime):
             )
         )
 
-    return rmse_e, rmse_f, ci_e, ci_f
+    return ci_e, ci_f
 
+
+def _bootstrap_mol(x, y, n_samples=1000, ci=0.95):
+    """
+    """
+    z = []
+    for _x, _y in zip(x, y):
+        mse = torch.nn.functional.mse_loss(_x, _y).item()
+        z.append(np.sqrt(mse))
+    z = np.array(z)
+
+    results = []
+    for _ in range(n_samples):
+        _z = np.random.choice(z, z.size, replace=True)
+        results.append(_z.mean())
+
+    results = np.array(results)
+    low = np.percentile(results, 100.0 * 0.5 * (1 - ci))
+    high = np.percentile(results, (1 - ((1 - ci) * 0.5)) * 100.0)
+    mean = z.mean()
+
+    return mean, low, high
+
+
+def bootstrap_mol(u_ref, u, u_ref_prime, u_prime):
+    """
+    Bootstrap over molecules
+    """
+    mean, low, high = _bootstrap_mol(u_ref, u)
+    ci_e = esp.metrics.latex_format_ci(
+        mean * HARTEE_TO_KCALPERMOL, 
+        low * HARTEE_TO_KCALPERMOL, 
+        high * HARTEE_TO_KCALPERMOL
+        )
+
+    mean, low, high = _bootstrap_mol(u_ref_prime, u_prime)
+    ci_f = esp.metrics.latex_format_ci(
+        mean * (HARTEE_TO_KCALPERMOL/BOHR_TO_ANGSTROMS), 
+        low * (HARTEE_TO_KCALPERMOL/BOHR_TO_ANGSTROMS), 
+        high * (HARTEE_TO_KCALPERMOL/BOHR_TO_ANGSTROMS)
+        )
+
+    return ci_e, ci_f
 
 
 def calc_metric(net, ds, output_path, dataset, suffix):
@@ -181,10 +224,13 @@ def calc_metric(net, ds, output_path, dataset, suffix):
     df = df.sort_values(by="RMSE_FORCE", ascending=False)
     df.to_csv(f'{output_path}/rmse_{suffix}_{dataset}.csv', sep='\t')
     PandasTools.AddMoleculeColumnToFrame(df, "SMILES", "MOL")
-    open(f"{output_path}/rmse_{suffix}_{dataset}.csv", "w").write(df.to_html())
+    open(f"{output_path}/rmse_{suffix}_{dataset}.html", "w").write(df.to_html())
 
-    # Bootstrap
-    rmse_e, rmse_f, ci_e, ci_f = bootstrap(u_ref, u, u_ref_prime, u_prime)
+    # Bootstrap over conformations
+    #ci_e, ci_f = bootstrap_conf(u_ref, u, u_ref_prime, u_prime)
+
+    # Bootstrap over molecule
+    ci_e, ci_f = bootstrap_mol(u_ref, u, u_ref_prime, u_prime)
 
     # Export
     ofile = 'report_summary.csv'
@@ -196,9 +242,7 @@ def calc_metric(net, ds, output_path, dataset, suffix):
     wf.write(f">{dataset} ({suffix})\n")
     wf.write("----------\n")
     wf.write(f"energy: {ci_e}\n")
-    #wf.write(f"{rmse_e:.4f}\n")
     wf.write(f"force: {ci_f}\n")
-    #wf.write(f"{rmse_f:.4f}\n")
     wf.write("\n")
     wf.close()
 
