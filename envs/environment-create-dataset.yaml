@@ -372,10 +372,10 @@ dependencies:
   - pip:
     - amberlite==22.0
     - amberutils==21.0
-    - espaloma==0.3.0
+    #- espaloma==0.3.0
+    - git+https://github.com/choderalab/espaloma.git@0.3.0
     - mmpbsa-py==16.0
     - packmol-memgen==1.2.3rc0
     - pdb4amber==22.0
     - pytraj==2.0.6
     - sander==22.0
-prefix: /lila/home/takabak/mambaforge/envs/espaloma

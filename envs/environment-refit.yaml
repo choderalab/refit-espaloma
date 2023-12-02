@@ -335,7 +335,8 @@ dependencies:
     - amberlite==22.0
     - amberutils==21.0
     - barnaba==0.1.8
-    - espaloma==0.3.0+1.g4c6155b
+    #- espaloma==0.3.0+1.g4c6155b
+    - git+https://github.com/choderalab/espaloma.git@4c6155b72d00ce0190b3cb551e7e59f0adc33a56
     - mmpbsa-py==16.0
     - packmol-memgen==1.2.3rc0
     - pdb4amber==22.0
@@ -343,4 +344,3 @@ dependencies:
     - sander==22.0
     - sklearn==0.0
     - wheel==0.37.1
-prefix: /lila/home/takabak/mambaforge/envs/espaloma-fix
