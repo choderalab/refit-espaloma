@@ -64,7 +64,7 @@ If you find this helpful please cite the following:
 ```
 @misc{takaba2023machinelearned,
       title={Machine-learned molecular mechanics force field for the simulation of protein-ligand systems and beyond}, 
-      author={Kenichiro Takaba and Iván Pulido and Pavan Kumar Behara and Mike Henry and Hugo MacDermott-Opeskin and John D. Chodera and Yuanqing Wang},
+      author={Kenichiro Takaba, Iván Pulido, Pavan Kumar Behara, Chapin E. Cavender, Anika J. Friedman, Michael M. Henry, Hugo MacDermott Opeskin, Christopher R. Iacovella, Arnav M. Nagle, Alexander Matthew Payne, Michael R. Shirts, David L. Mobley, John D. Chodera, Yuanqing Wang},
       year={2023},
       eprint={2307.07085},
       archivePrefix={arXiv},
