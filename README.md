@@ -5,6 +5,7 @@ This repository includes scripts to retrain and generate `espaloma-0.3.0` forcef
 `espaloma-0.3.0` force field is a `Class I` force field where the valence parameters are assigned and optimized via machine learning framework.
 This repository is part of [espaloma-0.3.0-manuscript](https://github.com/choderalab/espaloma-0.3.0-manuscript).
 
+Note that there is a refactored repository to train espaloma ([espfit](https://github.com/choderalab/espfit)) and an example workspace ([espfit_workspace](https://github.com/choderalab/espfit-experiment)) to use espfit. However, please be aware that these repositories are still under development.
 
 ## Description
 We first convert the HDF5 files obtained from [download-qca-dataset](https://github.com/choderalab/download-qca-datasets) to DGL graphs.
